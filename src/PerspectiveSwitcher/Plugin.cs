@@ -233,7 +233,7 @@ public partial class Plugin : BaseUnityPlugin
 
         // 初始化适配器（策略 / 适配器模式）
         _adapters[PerspectiveMode.FirstPerson] = new FirstPersonAdapter();
-        _adapters[PerspectiveMode.SecondPerson] = new OrbitPerspectiveAdapter(this, PerspectiveMode.SecondPerson, +1);
+        //_adapters[PerspectiveMode.SecondPerson] = new OrbitPerspectiveAdapter(this, PerspectiveMode.SecondPerson, +1);
         _adapters[PerspectiveMode.ThirdPerson] = new OrbitPerspectiveAdapter(this, PerspectiveMode.ThirdPerson, -1);
 
         // 统一入口：在比较早期挂接
@@ -294,8 +294,7 @@ public partial class Plugin : BaseUnityPlugin
     {
         _currentMode = _currentMode switch
         {
-            PerspectiveMode.FirstPerson => PerspectiveMode.SecondPerson,
-            PerspectiveMode.SecondPerson => PerspectiveMode.ThirdPerson,
+            PerspectiveMode.FirstPerson => PerspectiveMode.ThirdPerson,
             _ => PerspectiveMode.FirstPerson
         };
 
@@ -309,7 +308,7 @@ public partial class Plugin : BaseUnityPlugin
     private void MainCameraMovement_LateUpdate(On.MainCameraMovement.orig_LateUpdate orig, MainCameraMovement self)
     {
         // 统一前处理：按键切换、灵敏度初始化等
-        if (Input.GetKeyDown(configSwitchPerspective.Value))
+        if (Input.GetKeyDown(configSwitchPerspective.Value) && (GUIManager.instance != null && !GUIManager.instance.windowBlockingInput))
         {
             SwitchToNextMode();
         }
