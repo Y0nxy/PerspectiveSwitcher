@@ -211,6 +211,7 @@ public partial class Plugin : BaseUnityPlugin
     internal static ManualLogSource Log { get; private set; } = null!;
 
     private ConfigEntry<KeyCode> configSwitchPerspective = null!;
+    private ConfigEntry<KeyCode> SecondPersonSwitch = null!;
 
     private bool _settingsInitialized;
     private MouseSensitivitySetting _mouseSensSetting = null!;
@@ -230,6 +231,11 @@ public partial class Plugin : BaseUnityPlugin
             "SwitchPerspective",
             KeyCode.V,
             "Switch the camera perspective (First -> Second -> Third)");
+        SecondPersonSwitch = Config.Bind(
+            "Camera.Toggles",
+            "ToggleSecondPerson",
+            KeyCode.F2,
+            "Switch to second person perspective");
 
         // 初始化适配器（策略 / 适配器模式）
         _adapters[PerspectiveMode.FirstPerson] = new FirstPersonAdapter();
@@ -300,6 +306,21 @@ public partial class Plugin : BaseUnityPlugin
 
         Log.LogInfo($"Switched perspective to: {_currentMode}");
     }
+    private PerspectiveMode _previousMode = PerspectiveMode.FirstPerson;
+    private void SwitchToSecondMode()
+    {
+        if (_currentMode == PerspectiveMode.SecondPerson)
+        {
+            _currentMode = _previousMode;
+        }
+        else
+        {
+            _previousMode = _currentMode;
+            _currentMode = PerspectiveMode.SecondPerson;
+        }
+
+        Log.LogInfo($"Switched perspective to: {_currentMode}");
+    }
 
     #endregion
 
@@ -308,9 +329,16 @@ public partial class Plugin : BaseUnityPlugin
     private void MainCameraMovement_LateUpdate(On.MainCameraMovement.orig_LateUpdate orig, MainCameraMovement self)
     {
         // 统一前处理：按键切换、灵敏度初始化等
-        if (Input.GetKeyDown(configSwitchPerspective.Value) && (GUIManager.instance != null && !GUIManager.instance.windowBlockingInput))
+        if (GUIManager.instance != null && !GUIManager.instance.windowBlockingInput)
         {
-            SwitchToNextMode();
+            if (Input.GetKeyDown(configSwitchPerspective.Value))
+            {
+                SwitchToNextMode();
+            }
+            if (Input.GetKeyDown(SecondPersonSwitch.Value))
+            {
+                SwitchToSecondMode();
+            }
         }
 
         EnsureSettings();
