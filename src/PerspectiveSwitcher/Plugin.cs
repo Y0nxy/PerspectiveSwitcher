@@ -239,7 +239,7 @@ public partial class Plugin : BaseUnityPlugin
 
         // 初始化适配器（策略 / 适配器模式）
         _adapters[PerspectiveMode.FirstPerson] = new FirstPersonAdapter();
-        //_adapters[PerspectiveMode.SecondPerson] = new OrbitPerspectiveAdapter(this, PerspectiveMode.SecondPerson, +1);
+        _adapters[PerspectiveMode.SecondPerson] = new OrbitPerspectiveAdapter(this, PerspectiveMode.SecondPerson, +1);
         _adapters[PerspectiveMode.ThirdPerson] = new OrbitPerspectiveAdapter(this, PerspectiveMode.ThirdPerson, -1);
 
         // 统一入口：在比较早期挂接
